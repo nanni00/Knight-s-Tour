@@ -1,9 +1,11 @@
+import chessboard.BoardFrame;
+
 public class Test {
 
     public native boolean KnightTour(int m, int n, int startRow, int startCol, int[] path);
 
     static {
-        System.load("C:\\Users\\ADMIN\\Desktop\\KnightTour-Java\\src\\main\\c\\KnightTour.dll");
+        System.load("C:\\Users\\giova\\IdeaProjects\\Knight-s-Tour\\src\\main\\c\\KnightTour.dll");
         //System.loadLibrary("KnightTour");
     }
 
@@ -36,13 +38,21 @@ public class Test {
 
     public static void main(String[] args) {
 
-        int m = 7;
-        int n = 8;
+        int m = 50;
+        int n = 50;
         int starRow = 0;
         int startColumn = 0;
         int[] path = new int[m * n];
-//        boolean b = new Test().KnightTour(m, n, starRow, startColumn, path);
 
-        allPoints(m, n);
+        long start = System.nanoTime();
+        if (new Test().KnightTour(m, n, starRow, startColumn, path)) {
+            long end = System.nanoTime();
+
+            System.out.println("Total finding path time: " + ((end - start) / 1000000.0));
+
+            //printBoard(m, n, path);
+            //BoardFrame boardFrame = new BoardFrame(m, n, path);
+            //boardFrame.display();
+        }
     }
 }
