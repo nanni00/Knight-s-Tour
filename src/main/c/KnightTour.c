@@ -1,5 +1,5 @@
 #include "jni.h"
-#include "Test.h"
+#include "kthandler_KnightTourHandler.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -183,24 +183,17 @@ bool WarnsdorffRule(int m, int n, int *board, int *tiePoint, int startRow, int s
 }
 
 
-void copyArray(int m, int n, const int *board, jintArray answer_array, JNIEnv *env) {
-
+void copyArrayJava(int m, int n, const int *board, jintArray answer_array, JNIEnv *env) {
     (*env)->SetIntArrayRegion(env, answer_array, 0, m * n, (const jint *) board);
-    /*
-    for (int r = 0; r < m; ++r) {
-        for (int c = 0; c < n; ++c) {
-            path[r * n + c] = board[r * n + c];
-        }
-    }*/
 }
 
-JNIEXPORT jboolean JNICALL Java_Test_KnightTour (JNIEnv *env, jobject jobj, jint m, jint n, jint startRow, jint startColumn, jintArray answer_array) {
+void copyArrayC(int m, int n, const int *board, int *path) {
+    for (int i = 0; i < m * n; ++i) {
+        path[i] = board[i];
+    }
+}
 
-//bool KnightTour(int m, int n, int startRow, int startColumn, int *answer_array) {
-    /* board legend: 0 not occupied yet, a number greater than 0 means the knight step on the square */
-    int *board;
-    int *tiePoint;
-
+bool checkInput(int m, int n, int startRow, int startColumn, void *answer_array) {
     /* check input values */
     if (!isInBoard(m, n, startRow, startColumn)) {
         printf("ERROR. Invalid input: (%d, %d) is not on board.\n", startRow, startColumn);
@@ -211,7 +204,6 @@ JNIEXPORT jboolean JNICALL Java_Test_KnightTour (JNIEnv *env, jobject jobj, jint
         printf("ERROR. Invalid input: answer_array initialized 'NULL'\n");
         return false;
     }
-
 
     /* check condition 0: m <= n */
     if (conditionZero(m, n) && DEBUG) {
@@ -230,46 +222,62 @@ JNIEXPORT jboolean JNICALL Java_Test_KnightTour (JNIEnv *env, jobject jobj, jint
         printf("Is not guaranteed a solution in that case\n\n");
     }
 
-    /* check condition 2: */
+    /* check condition 3: */
     if (conditionThree(m, n)) {
         printf("Condition 3 satisfied: m = 3 and n = 4, 6 or 8.\n");
         printf("Is not guaranteed a solution in that case\n\n");
     }
 
+    return true;
+}
 
-    /* creat the board and tiePoint arrays */
-    board = (int *) calloc(m * n, sizeof(int));
-    tiePoint = NULL; // for now
+bool KnightTour(int m, int n, int startRow, int startColumn, int *board, int *tiePoint) {
 
     /* set the initial position as 1 */
     board[startRow * n + startColumn] = 1;
 
-    int try = 0;
-    bool ret = WarnsdorffRule(m, n, board, tiePoint, startRow, startColumn);
-
-    if (ret) {
-        copyArray(m, n, board, answer_array, env);
-
-
-
-    } else {
-        /* if first try fails the program will retry 7 times changing moves order */
-
+     int try = 0;
+     if (WarnsdorffRule(m, n, board, tiePoint, startRow, startColumn)) {
+        return true;
+     } else {
         for (int i = 0; i < 7; ++i) {
             printf("Try %d failed. Retry...\n", i + 1);
             rotateMoves(try + 1);
-            free(board);
-            board = (int *) calloc(m * n, sizeof(int));
+
+            for (int j = 0; j < m * n; ++i) board[i] = 0;
 
             board[startRow * n + startColumn] = 1;
 
             if (WarnsdorffRule(m, n, board, tiePoint, startRow, startColumn)) {
                 printf("Try %d succeeded.\n", try + 2);
-                copyArray(m, n, board, answer_array, env);
-                ret = true;
-                break;
+                return true;
             }
         }
+     }
+
+    return false;
+}
+
+/**
+  * Specific Java caller for the program.
+  */
+JNIEXPORT jboolean JNICALL Java_kthandler_KnightTourHandler_KnightTour_1JavaCaller (JNIEnv *env, jobject jobj, jint m, jint n, jint startRow, jint startColumn, jintArray answer_array) {
+    //bool KnightTour(int m, int n, int startRow, int startColumn, int *answer_array) {
+    /* board legend: 0 not occupied yet, a number greater than 0 means the knight step on the square */
+    int *board;
+    int *tiePoint;
+    bool ret;
+
+    if (!checkInput(m, n, startRow, startColumn, answer_array)) {
+        return false;
+    }
+
+    /* create the board and tiePoint arrays */
+    board = (int *) calloc(m * n, sizeof(int));
+    tiePoint = NULL; // for now
+
+    if ((ret = KnightTour(m, n, startRow, startColumn, board, tiePoint))) {
+        copyArrayJava(m, n, board, answer_array, env);
     }
 
     if (board != NULL)
@@ -278,9 +286,31 @@ JNIEXPORT jboolean JNICALL Java_Test_KnightTour (JNIEnv *env, jobject jobj, jint
     if (tiePoint != NULL)
         free(tiePoint);
 
-    if (DEBUG) {
-        printf("Program Knight's Tour finished and returned %d\n", ret);
+    return ret;
+}
+
+bool KnightTour_Ccaller(int m, int n, int startRow, int startColumn, int *path) {
+    if (!checkInput(m, n, startRow, startColumn, path)) {
+        return false;
     }
 
+    bool ret;
+
+    /* create the board and tiePoint arrays */
+    int *board = (int *) calloc(m * n, sizeof(int));
+    int *tiePoint = NULL; // for now
+
+    if ((ret = KnightTour(m, n, startRow, startColumn, board, tiePoint))) {
+        copyArrayC(m, n, board, path);
+    }
+
+    if (board != NULL)
+        free(board);
+
+    if (tiePoint != NULL)
+        free(tiePoint);
+
     return ret;
+
+
 }
