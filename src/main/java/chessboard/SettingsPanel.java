@@ -57,8 +57,16 @@ public class SettingsPanel extends JPanel implements ActionListener {
         add(startRow);
         add(startColLabel);
         add(startCol);
-    }
+    } // SettingsPanel()
 
+
+    private void failFoundPathMessage(int r, int c, int sr, int sc) {
+        String s = String.format("Impossible find a solution with input:\nRows=%d, Columns=%d, Start Row=%d, Start Column=%d", r, c, sr, sc);
+        JOptionPane.showMessageDialog(getParent(),
+                s,
+                "Impossible find a solution",
+                JOptionPane.ERROR_MESSAGE);
+    } // failFoundPathMessage()
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -95,7 +103,10 @@ public class SettingsPanel extends JPanel implements ActionListener {
                         ) == 0) {
                     if (new KnightTourHandler().KnightTour_JavaCaller(r, c, sr, sc, path)) {
                         parent.updateBoard(r, c, path);
+                    } else {
+                        failFoundPathMessage(r, c, sr, sc);
                     }
+
                 }
             } else if ((r > 14 && c > 14) || (r > 14 && c > 10) || (r > 10 && c > 14)) {
                 if (JOptionPane.showOptionDialog(
@@ -124,21 +135,19 @@ public class SettingsPanel extends JPanel implements ActionListener {
                             out.flush();
                             out.close();
                         }
-
-
                     } catch (IOException ioException) {
                         ioException.printStackTrace();
                     }
+
                 }
-            }
-
-
-            else {
+            } else {
                 if (new KnightTourHandler().KnightTour_JavaCaller(r, c, sr, sc, path)) {
                     parent.updateBoard(r, c, path);
+                } else {
+                    failFoundPathMessage(r, c, sr, sc);
                 }
             }
         }
+    } // actionPerformed()
 
-    }
 }

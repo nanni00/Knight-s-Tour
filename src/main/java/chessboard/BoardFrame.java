@@ -5,7 +5,6 @@ import javax.swing.*;
 
 
 public class BoardFrame extends JFrame {
-    private static final long serialVersionUID = 1L;
 
     int w = 600, h = 600;
     int settingH = 50;
@@ -64,7 +63,20 @@ public class BoardFrame extends JFrame {
         for (int r = 0; r < rows; ++r) {
             for (int c = 0; c < cols; ++c) {
                 labels[r * cols + c] = new ChessLabel(Integer.toString(path[r * cols + c]));
-                labels[r * cols + c].set(r * cols + c, r);
+                if (r % 2 == 0) {
+                    if (c % 2 == 0) {
+                        labels[r * cols + c].set(0);
+                    } else {
+                        labels[r * cols + c].set(1);
+                    }
+                } else {
+                    if (c % 2 == 0) {
+                        labels[r * cols + c].set(1);
+                    } else {
+                        labels[r * cols + c].set(0);
+                    }
+                }
+
                 board.add(labels[r * cols + c]);
             }
         }

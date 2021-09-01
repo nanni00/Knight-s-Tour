@@ -244,7 +244,7 @@ bool KnightTour(int m, int n, int startRow, int startColumn, int *board, int *ti
             printf("Try %d failed. Retry...\n", i + 1);
             rotateMoves(try + 1);
 
-            for (int j = 0; j < m * n; ++i) board[i] = 0;
+            for (int j = 0; j < m * n; ++j) board[j] = 0;
 
             board[startRow * n + startColumn] = 1;
 
