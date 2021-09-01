@@ -1,4 +1,4 @@
-#include "jni.h"
+#include <jni.h>
 #include "kthandler_KnightTourHandler.h"
 
 #include <stdio.h>

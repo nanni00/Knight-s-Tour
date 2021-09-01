@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -68,6 +69,32 @@ public class SettingsPanel extends JPanel implements ActionListener {
                 JOptionPane.ERROR_MESSAGE);
     } // failFoundPathMessage()
 
+
+    private boolean callKnightTourSolver(int r, int c, int sr, int sc, int[] path) {
+        try {
+            if (new KnightTourHandler().solveTour(r, c, sr, sc, path)) {
+                parent.updateBoard(r, c, path);
+                return true;
+            } else {
+                failFoundPathMessage(r, c, sr, sc);
+            }
+        } catch (FileNotFoundException fnfe) {
+            JOptionPane.showMessageDialog(getParent(),
+                    "Impossible to find KnightTour.dll file.\n" + fnfe.getLocalizedMessage(),
+                    "File Error",
+                    JOptionPane.ERROR_MESSAGE
+                    );
+        } catch (UnsatisfiedLinkError ule) {
+            JOptionPane.showMessageDialog(getParent(),
+                    "Impossible to load KnightTour.dll file.\n" + ule.getLocalizedMessage(),
+                    "File Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+        return false;
+    } // callKnightTourSolver
+
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == start) {
@@ -101,11 +128,7 @@ public class SettingsPanel extends JPanel implements ActionListener {
                         options,
                         null
                         ) == 0) {
-                    if (new KnightTourHandler().KnightTour_JavaCaller(r, c, sr, sc, path)) {
-                        parent.updateBoard(r, c, path);
-                    } else {
-                        failFoundPathMessage(r, c, sr, sc);
-                    }
+                    callKnightTourSolver(r, c, sr, sc, path);
 
                 }
             } else if ((r > 14 && c > 14) || (r > 14 && c > 10) || (r > 10 && c > 14)) {
@@ -123,7 +146,7 @@ public class SettingsPanel extends JPanel implements ActionListener {
                     try {
                         FileWriter out = new FileWriter(filePath);
 
-                        if (new KnightTourHandler().KnightTour_JavaCaller(r, c, sr, sc, path)) {
+                        if (callKnightTourSolver(r, c, sr, sc, path)) {
                             for (int i = 0; i < r; ++i) {
                                 for (int j = 0; j < c; ++j) {
                                     out.write(String.valueOf(path[i * c + j]));
@@ -141,11 +164,8 @@ public class SettingsPanel extends JPanel implements ActionListener {
 
                 }
             } else {
-                if (new KnightTourHandler().KnightTour_JavaCaller(r, c, sr, sc, path)) {
-                    parent.updateBoard(r, c, path);
-                } else {
-                    failFoundPathMessage(r, c, sr, sc);
-                }
+                callKnightTourSolver(r, c, sr, sc, path);
+
             }
         }
     } // actionPerformed()

@@ -3,7 +3,6 @@ import java.awt.*;
 import java.util.Objects;
 import javax.swing.*;
 
-
 public class BoardFrame extends JFrame {
 
     int w = 600, h = 600;
@@ -30,6 +29,7 @@ public class BoardFrame extends JFrame {
         settings = new SettingsPanel(this, new Dimension(w, settingH), rows, cols, 1, 1);
 
         display();
+
     } // BoardFrame()
 
 
