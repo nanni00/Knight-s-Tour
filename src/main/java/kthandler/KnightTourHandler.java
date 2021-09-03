@@ -1,32 +1,35 @@
 package kthandler;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import setup.SetUpFiles;
+
 
 public class KnightTourHandler {
 
     private native boolean KnightTour_JavaCaller(int m, int n, int startRow, int startCol, int[] path);
 
-    String relativePath = "src\\main\\resources\\";
-    String dllName = "KnightTour.dll";
-    String path;
 
-    private boolean dllLoaded = false;
+    static {
+        assert SetUpFiles.getDllPath() != null;
+        String dllPath = SetUpFiles.getDllPath() + ".dll";
+
+        try {
+            System.load(dllPath);
+        } catch (UnsatisfiedLinkError ule) {
+            System.out.println("System.load() failed.");
+            System.out.println(ule.getMessage());
+
+
+            System.out.println("Impossible to load the library from " + dllPath);
+            System.out.println("Terminating program...");
+            System.exit(1);
+        }
+
+    }
 
 
     public KnightTourHandler() {
 
     } // KnightTourHandler()
-
-
-    private void checkExistingDllPath() throws FileNotFoundException {
-        File file = new File(relativePath + dllName);
-        if (file.exists()) {
-            path = file.getAbsolutePath();
-        } else {
-            throw new FileNotFoundException("Impossible to find " + dllName);
-        }
-    } // checkExistingDllPath()
 
 
     /**
@@ -37,18 +40,8 @@ public class KnightTourHandler {
      * @param sc the starting column
      * @param answer an array which will store eventually a path
      * @return true if any full path was found, false otherwise
-     * @throws FileNotFoundException if .dll file 'KnightTour.dll' is not found
-     * @throws UnsatisfiedLinkError if has been impossible to load the .dll 'KnightTour.dll' file
      */
-    public boolean solveTour(int r, int c, int sr, int sc, int[] answer) throws FileNotFoundException, UnsatisfiedLinkError {
-
-        if (!dllLoaded) {
-            checkExistingDllPath();
-            System.load(path);
-
-            dllLoaded = true;
-        }
-
+    public boolean solveTour(int r, int c, int sr, int sc, int[] answer) {
         return KnightTour_JavaCaller(r, c, sr, sc, answer);
     } // solveTour()
 

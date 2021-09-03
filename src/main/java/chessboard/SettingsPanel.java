@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -71,25 +70,13 @@ public class SettingsPanel extends JPanel implements ActionListener {
 
 
     private boolean callKnightTourSolver(int r, int c, int sr, int sc, int[] path) {
-        try {
-            if (new KnightTourHandler().solveTour(r, c, sr, sc, path)) {
-                parent.updateBoard(r, c, path);
-                return true;
-            } else {
-                failFoundPathMessage(r, c, sr, sc);
-            }
-        } catch (FileNotFoundException fnfe) {
-            JOptionPane.showMessageDialog(getParent(),
-                    "Impossible to find KnightTour.dll file.\n" + fnfe.getLocalizedMessage(),
-                    "File Error",
-                    JOptionPane.ERROR_MESSAGE
-                    );
-        } catch (UnsatisfiedLinkError ule) {
-            JOptionPane.showMessageDialog(getParent(),
-                    "Impossible to load KnightTour.dll file.\n" + ule.getLocalizedMessage(),
-                    "File Error",
-                    JOptionPane.ERROR_MESSAGE);
+        if (new KnightTourHandler().solveTour(r, c, sr, sc, path)) {
+            parent.updateBoard(r, c, path);
+            return true;
+        } else {
+            failFoundPathMessage(r, c, sr, sc);
         }
+
 
         return false;
     } // callKnightTourSolver
