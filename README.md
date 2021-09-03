@@ -5,4 +5,4 @@ In order to do that it has been necessary get a specific header file (.h) and a 
 
 For more details,
 - about Knight's Tour problem: https://en.wikipedia.org/wiki/Knight%27s_tour
-- about JNI: https://docs.oracle.com/en/java/javase/16/docs/specs/jni/index.html for more details
+- about JNI: https://docs.oracle.com/en/java/javase/16/docs/specs/jni/index.html
