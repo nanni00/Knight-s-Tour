@@ -1,17 +1,18 @@
 package chessboard;
 
 import kthandler.KnightTourHandler;
+import setup.FilesManager;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class SettingsPanel extends JPanel implements ActionListener {
 
     int r, c, sr, sc;
+
+    private final FilesManager filesManager;
 
     BoardFrame parent;
 
@@ -22,13 +23,14 @@ public class SettingsPanel extends JPanel implements ActionListener {
 
     private final JButton start;
 
-    public SettingsPanel(BoardFrame parent, Dimension d, int r, int c, int sr, int sc) {
+    public SettingsPanel(BoardFrame parent, Dimension d, int r, int c, int sr, int sc, FilesManager filesManager) {
         super(new GridLayout(2, 9));
         this.parent = parent;
         this.r = r;
         this.c = c;
         this.sr = r;
         this.sc = sc;
+        this.filesManager = filesManager;
 
         setPreferredSize(d);
 
@@ -69,17 +71,22 @@ public class SettingsPanel extends JPanel implements ActionListener {
     } // failFoundPathMessage()
 
 
-    private boolean callKnightTourSolver(int r, int c, int sr, int sc, int[] path) {
+    private void callKnightTourSolver(int r, int c, int sr, int sc, int[] path) {
         if (new KnightTourHandler().solveTour(r, c, sr, sc, path)) {
             parent.updateBoard(r, c, path);
+        } else {
+            failFoundPathMessage(r, c, sr, sc);
+        }
+    } // callKnightTourSolver()
+
+    private boolean callKnightTourSolverNoUpdateBoard(int r, int c, int sr, int sc, int[] path) {
+        if (new KnightTourHandler().solveTour(r, c, sr, sc, path)) {
             return true;
         } else {
             failFoundPathMessage(r, c, sr, sc);
         }
-
-
         return false;
-    } // callKnightTourSolver
+    } // callKnightTourSolverNoUpdateBoard()
 
 
     @Override
@@ -109,44 +116,22 @@ public class SettingsPanel extends JPanel implements ActionListener {
                         getParent(),
                         "Input rows and cols both odd, is not guaranteed a path. Continue?",
                         "Warning input values",
-                        JOptionPane.YES_NO_CANCEL_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        options,
-                        null
-                        ) == 0) {
+                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+                        null, options, null
+                ) == 0) {
                     callKnightTourSolver(r, c, sr, sc, path);
 
                 }
-            } else if ((r > 14 && c > 14) || (r > 14 && c > 10) || (r > 10 && c > 14)) {
+            } else if ((r > 16 && c > 16) || (r > 14 && c > 10) || (r > 10 && c > 14)) {
                 if (JOptionPane.showOptionDialog(
                         getParent(),
                         "Impossible draw the board with these rows/columns values; do you want to get the output on a file? (Located in your Desktop folder)",
                         "Warning input values",
-                        JOptionPane.YES_NO_CANCEL_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,
-                        options,
-                        null
+                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE,
+                        null, options, null
                 ) == 0) {
-                    String filePath = System.getProperty("user.home") + System.getProperty("file.separator") + "kt-path.txt";
-                    try {
-                        FileWriter out = new FileWriter(filePath);
-
-                        if (callKnightTourSolver(r, c, sr, sc, path)) {
-                            for (int i = 0; i < r; ++i) {
-                                for (int j = 0; j < c; ++j) {
-                                    out.write(String.valueOf(path[i * c + j]));
-                                    out.write("\t");
-                                }
-                                out.write("\n");
-                            }
-
-                            out.flush();
-                            out.close();
-                        }
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
+                    if (callKnightTourSolverNoUpdateBoard(r, c, sr, sc, path)) {
+                        filesManager.writePathOnFile(r, c, path);
                     }
 
                 }

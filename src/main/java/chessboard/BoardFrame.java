@@ -1,4 +1,6 @@
 package chessboard;
+import setup.FilesManager;
+
 import java.awt.*;
 import java.util.Objects;
 import javax.swing.*;
@@ -17,7 +19,7 @@ public class BoardFrame extends JFrame {
     SettingsPanel settings;
     JPanel board;
 
-    public BoardFrame(int rows, int cols, int[] path) {
+    public BoardFrame(int rows, int cols, int[] path, FilesManager fileManager) {
         super();
         this.rows = rows;
         this.cols = cols;
@@ -26,7 +28,7 @@ public class BoardFrame extends JFrame {
 
         contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
-        settings = new SettingsPanel(this, new Dimension(w, settingH), rows, cols, 1, 1);
+        settings = new SettingsPanel(this, new Dimension(w, settingH), rows, cols, 1, 1, fileManager);
 
         display();
 

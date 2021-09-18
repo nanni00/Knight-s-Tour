@@ -1,6 +1,6 @@
 package kthandler;
 
-import setup.SetUpFiles;
+import setup.FilesManager;
 
 
 public class KnightTourHandler {
@@ -8,23 +8,7 @@ public class KnightTourHandler {
     private native boolean KnightTour_JavaCaller(int m, int n, int startRow, int startCol, int[] path);
 
 
-    static {
-        assert SetUpFiles.getDllPath() != null;
-        String dllPath = SetUpFiles.getDllPath() + ".dll";
 
-        try {
-            System.load(dllPath);
-        } catch (UnsatisfiedLinkError ule) {
-            System.out.println("System.load() failed.");
-            System.out.println(ule.getMessage());
-
-
-            System.out.println("Impossible to load the library from " + dllPath);
-            System.out.println("Terminating program...");
-            System.exit(1);
-        }
-
-    }
 
 
     public KnightTourHandler() {
