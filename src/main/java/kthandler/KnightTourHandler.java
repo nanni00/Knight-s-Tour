@@ -1,15 +1,8 @@
 package kthandler;
 
-import setup.FilesManager;
-
-
 public class KnightTourHandler {
 
     private native boolean KnightTour_JavaCaller(int m, int n, int startRow, int startCol, int[] path);
-
-
-
-
 
     public KnightTourHandler() {
 
@@ -29,4 +22,4 @@ public class KnightTourHandler {
         return KnightTour_JavaCaller(r, c, sr, sc, answer);
     } // solveTour()
 
-}
+} // class KnightTourHandler

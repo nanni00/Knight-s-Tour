@@ -13,6 +13,7 @@ public class SettingsPanel extends JPanel implements ActionListener {
     int r, c, sr, sc;
 
     private final FilesManager filesManager;
+    private final KnightTourHandler knightTourHandler;
 
     BoardFrame parent;
 
@@ -31,6 +32,7 @@ public class SettingsPanel extends JPanel implements ActionListener {
         this.sr = r;
         this.sc = sc;
         this.filesManager = filesManager;
+        this.knightTourHandler = new KnightTourHandler();   // HAS-A relationship
 
         setPreferredSize(d);
 
@@ -71,22 +73,16 @@ public class SettingsPanel extends JPanel implements ActionListener {
     } // failFoundPathMessage()
 
 
-    private void callKnightTourSolver(int r, int c, int sr, int sc, int[] path) {
-        if (new KnightTourHandler().solveTour(r, c, sr, sc, path)) {
-            parent.updateBoard(r, c, path);
-        } else {
-            failFoundPathMessage(r, c, sr, sc);
-        }
-    } // callKnightTourSolver()
-
-    private boolean callKnightTourSolverNoUpdateBoard(int r, int c, int sr, int sc, int[] path) {
-        if (new KnightTourHandler().solveTour(r, c, sr, sc, path)) {
+    private boolean callKnightTourSolver(int r, int c, int sr, int sc, int[] path, boolean updateBoard) {
+        if (knightTourHandler.solveTour(r, c, sr, sc, path)) {
+            if (updateBoard)
+                parent.updateBoard(r, c, path);
             return true;
         } else {
             failFoundPathMessage(r, c, sr, sc);
+            return false;
         }
-        return false;
-    } // callKnightTourSolverNoUpdateBoard()
+    } // callKnightTourSolver()
 
 
     @Override
@@ -98,14 +94,12 @@ public class SettingsPanel extends JPanel implements ActionListener {
                 r = Integer.parseInt(rows.getText());
                 c = Integer.parseInt(cols.getText());
 
-                sr = Integer.parseInt(startRow.getText());
-                sc = Integer.parseInt(startCol.getText());
+                sr = Integer.parseInt(startRow.getText()) - 1;
+                sc = Integer.parseInt(startCol.getText()) - 1;
             } catch (NumberFormatException nfe) {
                 JOptionPane.showMessageDialog(getParent(), "Invalid input value/s", "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-
-            sr--;
-            sc--;
 
             int[] path = new int[r * c];
 
@@ -119,27 +113,27 @@ public class SettingsPanel extends JPanel implements ActionListener {
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, options, null
                 ) == 0) {
-                    callKnightTourSolver(r, c, sr, sc, path);
+                    callKnightTourSolver(r, c, sr, sc, path, true);
 
                 }
-            } else if ((r > 16 && c > 16) || (r > 14 && c > 10) || (r > 10 && c > 14)) {
+            } else if (r > 16 || c > 16) {
                 if (JOptionPane.showOptionDialog(
                         getParent(),
-                        "Impossible draw the board with these rows/columns values; do you want to get the output on a file? (Located in your Desktop folder)",
+                        "Impossible draw the board with these rows/columns values; do you want to get the output on a file? (Located in " + filesManager.getRootDirPath() + ")",
                         "Warning input values",
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE,
                         null, options, null
                 ) == 0) {
-                    if (callKnightTourSolverNoUpdateBoard(r, c, sr, sc, path)) {
+                    if (callKnightTourSolver(r, c, sr, sc, path, false)) {
                         filesManager.writePathOnFile(r, c, path);
                     }
 
                 }
             } else {
-                callKnightTourSolver(r, c, sr, sc, path);
+                callKnightTourSolver(r, c, sr, sc, path, true);
 
             }
         }
     } // actionPerformed()
 
-}
+} // class SettingsPanel

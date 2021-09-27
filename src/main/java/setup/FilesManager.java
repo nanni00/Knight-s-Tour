@@ -1,5 +1,7 @@
 package setup;
 
+import download.Download;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -85,6 +87,11 @@ public class FilesManager {
     } // SetUpFiles()
 
 
+    public String getRootDirPath() {
+        return rootDirPath;
+    } // getRootDirPath()
+
+
     /**
      * Create the directory which will hold the program's files.
      * Default for Windows is 'C:\Program Files\KnightsTour, if it is not found
@@ -134,10 +141,15 @@ public class FilesManager {
         }
     } // createProgramDirectories()
 
-
+    /**
+     * Write a path on file called "longPath.txt" located in the root program's directory.
+     * @param r the number of rows
+     * @param c the number of columns
+     * @param path the path solved
+     */
     public void writePathOnFile(int r, int c, int[] path) {
 
-        String fileName = "longDir";
+        String fileName = "longPath";
         String filePath = rootDirPath + fileSeparator + fileName + txt;
         try {
             int k = 1;
@@ -162,6 +174,6 @@ public class FilesManager {
             ioException.printStackTrace();
         }
 
-    }
+    } // writePathOnFile()
 
-}
+} // class FilesManager

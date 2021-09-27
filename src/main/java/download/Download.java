@@ -1,4 +1,4 @@
-package setup;
+package download;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -14,6 +14,12 @@ public class Download {
     } // Download()
 
 
+    /**
+     * Download a file from a specific link URL into a file
+     * @param link the link
+     * @param dstFile the destination file
+     * @throws IOException if it is not possible download the file because the URL resource isn't public or not reachable
+     */
     public static void DownloadFileFromLink(String link, String dstFile) throws IOException {
         URL url = new URL(link);
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -24,4 +30,4 @@ public class Download {
 
     } // DownloadFileFromLink()
 
-}
+} // class Download
