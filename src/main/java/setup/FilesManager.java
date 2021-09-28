@@ -26,7 +26,7 @@ public class FilesManager {
     public FilesManager() {
         createProgramDirectories();
 
-        String link = "https://github.com/Giovanni-M00/Knight-s-Tour/blob/master/out/production/resources/KnightTour.dll?raw=true";
+        String link = "https://github.com/nanni00/Knight-s-Tour/blob/master/out/production/resources/KnightTour.dll?raw=true";
 
         // standard path
         String dllPath = dllDirPath + fileSeparator + dllName + dll;
