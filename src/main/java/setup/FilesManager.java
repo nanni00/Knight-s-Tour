@@ -18,7 +18,6 @@ public class FilesManager {
     private static final String txt = ".txt";
     private static final String dll = ".dll";
     private static final String so = ".so";
-    private final String libtype;
 
     private static String resDirPath;
     private static String libDirPath;
@@ -26,19 +25,20 @@ public class FilesManager {
 
 
     public FilesManager() {
-        System.out.println(System.getProperty("os.name"));
+        String libtype;
+
+        String os = System.getProperty("os.name");
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {
             libtype = dll;
-        } else if (System.getProperty("os.name").toLowerCase().contains("unix")) {
+        } else if (System.getProperty("os.name").toLowerCase().contains("linux")) {
             libtype = so;
         } else {
             libtype = null;
+            System.out.println("OS not supported: " + os);
             System.exit(1);
         }
 
         createProgramDirectories();
-
-        String link = "https://github.com/nanni00/Knight-s-Tour/blob/master/out/production/resources/KnightTour.dll?raw=true";
 
         // standard path
         String libPath = libDirPath + fileSeparator + libKnightTour + libtype;
@@ -80,6 +80,7 @@ public class FilesManager {
                 out.flush();
                 out.close();
 
+                String link = "https://github.com/nanni00/Knight-s-Tour/blob/master/out/production/resources/" + libKnightTour + libtype + "?raw=true";
                 Download.DownloadFileFromLink(link, libPath);
             }
 

@@ -3,25 +3,10 @@
 A simple program that solves the Knight's Tour problem on a generic board MxN. 
 
 The project's core is written in C and is linked to the Java code through the Java Native Interface.
-In order to do that it has been necessary get a specific header file (.h) and a .dll file; 
-
-With the next line the Java Compiler creates the header file.
->  javac -h . .\kthandler\KnightTourHandler.java
- 
-
- Next, with
-> gcc -c KnightTour.c
-
-and 
-> gcc -shared -o KnightTour.dll KnightTour.o
- 
-
-the C compiler creates first the .o file and next the Dynamic Link Library, .dll, which contains the C algorithm.
-
+In order to do that it has been necessary get a specific header file and a library file (dll under Windows, so under Linux). 
 
 To run the program, download the jar file in the out/artifacts/KnightTour_jar directory and run the line below:
 > java -jar KnightTour.jar
-
 
 
 For more details,
