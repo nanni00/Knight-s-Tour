@@ -12,26 +12,38 @@ public class FilesManager {
 
     static final String fileSeparator = System.getProperty("file.separator");
 
-    private static final String dllName = "KnightTour-lib"; // the .dll file name
-    private static final String savedName = "KnightTourDllPath";  // a file where is saved the .dll file path
+    private static final String libKnightTour = "libknighttour"; // the .dll file name
+    private static final String savedName = "KnightTourLibsPath";  // a file where is saved the lib dir path
 
     private static final String txt = ".txt";
     private static final String dll = ".dll";
+    private static final String so = ".so";
+    private final String libtype;
 
     private static String resDirPath;
-    private static String dllDirPath;
+    private static String libDirPath;
     private static String rootDirPath;
 
 
     public FilesManager() {
+        System.out.println(System.getProperty("os.name"));
+        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+            libtype = dll;
+        } else if (System.getProperty("os.name").toLowerCase().contains("unix")) {
+            libtype = so;
+        } else {
+            libtype = null;
+            System.exit(1);
+        }
+
         createProgramDirectories();
 
         String link = "https://github.com/nanni00/Knight-s-Tour/blob/master/out/production/resources/KnightTour.dll?raw=true";
 
         // standard path
-        String dllPath = dllDirPath + fileSeparator + dllName + dll;
+        String libPath = libDirPath + fileSeparator + libKnightTour + libtype;
         String savedPath = resDirPath + fileSeparator + savedName + txt;
-        int dllPathLength = dllPath.length();
+        int libPathLength = libPath.length();
 
         /*
          * Try to read an existing path from the saving file;
@@ -46,12 +58,11 @@ public class FilesManager {
                  */
                 DataInputStream in = new DataInputStream(new FileInputStream(savedPath));
                 char[] buffer = new char[1024];
-                dllPathLength = in.readInt();
-                for (int i = 0; i < dllPathLength; ++i) {
+                libPathLength = in.readInt();
+                for (int i = 0; i < libPathLength; ++i) {
                     buffer[i] = (char) in.readByte();
                 }
-                dllPath = String.valueOf(buffer, 0, dllPathLength);
-
+                libPath = String.valueOf(buffer, 0, libPathLength);
 
             } else {
                 /*
@@ -60,26 +71,26 @@ public class FilesManager {
                  * Assuming that the dll doesn't exist yet also that file is created
                  */
                 Files.createFile(Path.of(savedPath));
-                Files.createFile(Path.of(dllPath));
+                Files.createFile(Path.of(libPath));
 
                 DataOutputStream out = new DataOutputStream(new FileOutputStream(savedPath));
 
-                out.writeInt(dllPathLength);
-                out.writeBytes(dllPath);
+                out.writeInt(libPathLength);
+                out.writeBytes(libPath);
                 out.flush();
                 out.close();
 
-                Download.DownloadFileFromLink(link, dllPath);
+                Download.DownloadFileFromLink(link, libPath);
             }
 
-            System.load(dllPath);
+            System.load(libPath);
             setUp = true;
 
         } catch (IOException e) {
             e.printStackTrace();
             setUp = false;
         } catch (UnsatisfiedLinkError ule) {
-            System.out.println("Impossible load file from " + dllPath);
+            System.out.println("Impossible load file from " + libPath);
             System.out.println(ule.getMessage());
             setUp = false;
         }
@@ -98,9 +109,8 @@ public class FilesManager {
      * the directory will be located into user's home.
      */
     private void createProgramDirectories() {
-
         String resDir = "res";
-        String dllDir = "DLLs";
+        String libDir = "Libs";
         String rootDir = "KnightsTour";
 
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {
@@ -113,7 +123,7 @@ public class FilesManager {
             rootDirPath = System.getProperty("user.home") + System.getProperty("file.separator") + rootDir;
         }
 
-        dllDirPath = dllDirPath + System.getProperty("file.separator") + dllDir;
+        libDirPath = libDirPath + System.getProperty("file.separator") + libDir;
         resDirPath = rootDirPath + System.getProperty("file.separator") + resDir;
 
         boolean ret1 = false, ret2 = false, ret3 = false;
@@ -126,18 +136,18 @@ public class FilesManager {
             ret2 = new File(resDirPath).mkdir();
         }
 
-        if (!Files.exists(Path.of(dllDirPath))) {
-            ret3 = new File(dllDirPath).mkdir();
+        if (!Files.exists(Path.of(libDirPath))) {
+            ret3 = new File(libDirPath).mkdir();
         }
 
         if (!ret1 || !ret2 || !ret3) {
             rootDirPath = System.getProperty("user.home") + System.getProperty("file.separator") + rootDir;
             resDirPath = rootDirPath + System.getProperty("file.separator") + resDir;
-            dllDirPath = rootDirPath + System.getProperty("file.separator") + dllDir;
+            libDirPath = rootDirPath + System.getProperty("file.separator") + libDir;
 
             new File(rootDirPath).mkdir();
             new File(resDirPath).mkdir();
-            new File(dllDirPath).mkdir();
+            new File(libDirPath).mkdir();
         }
     } // createProgramDirectories()
 
@@ -148,7 +158,6 @@ public class FilesManager {
      * @param path the path solved
      */
     public void writePathOnFile(int r, int c, int[] path) {
-
         String fileName = "longPath";
         String filePath = rootDirPath + fileSeparator + fileName + txt;
         try {
@@ -173,7 +182,6 @@ public class FilesManager {
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
-
     } // writePathOnFile()
 
 } // class FilesManager
